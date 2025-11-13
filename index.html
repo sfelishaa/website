@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Operasi Bilangan Bulat</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg1: #f0f7ff;
+        --bg2: #e6f2ff;
+        --card: #ffffff;
+        --accent: #6fb8ff;
+        --accent-2: #3aa0ff;
+        --text: #0d2636;
+        --muted: #5b6b75;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Press Start 2P", cursive;
+        background: linear-gradient(180deg, var(--bg1), var(--bg2));
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      /* Loading overlay */
+      #loader {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(180deg, #f7fbff, #eaf6ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .spinner {
+        width: 72px;
+        height: 72px;
+        border-radius: 12px;
+        background: conic-gradient(
+          var(--accent),
+          var(--accent-2),
+          #cfeaff 60%,
+          #ffffff 100%
+        );
+        animation: spin 1.2s linear infinite;
+        box-shadow: 0 6px 20px rgba(58, 160, 255, 0.18),
+          inset 0 -6px 18px rgba(255, 255, 255, 0.6);
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .wrap {
+        max-width: 980px;
+        width: 100%;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(12px);
+        transition: all 0.6s ease;
+      }
+      .wrap.show {
+        opacity: 1;
+        transform: none;
+      }
+
+      h1 {
+        font-size: 20px;
+        margin: 0 0 18px;
+        color: var(--accent-2);
+        text-shadow: 0 6px 18px rgba(58, 160, 255, 0.12);
+        line-height: 1.2;
+      }
+      .menu {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px;
+        margin-top: 18px;
+      }
+      .card {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 40px 16px;
+        box-shadow: 6px 10px 24px rgba(17, 40, 60, 0.06);
+        border: 1px solid rgba(58, 160, 255, 0.12);
+        cursor: pointer;
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
+        position: relative;
+        min-height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 12px 18px 36px rgba(17, 40, 60, 0.1);
+      }
+      .icon {
+        font-size: 28px;
+        color: var(--accent-2);
+      }
+      .label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .done-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #16a34a;
+        color: white;
+        padding: 6px 8px;
+        border-radius: 8px;
+        font-size: 10px;
+        box-shadow: 0 4px 10px rgba(22, 163, 74, 0.18);
+      }
+      .locked {
+        opacity: 0.6;
+        cursor: not-allowed;
+        filter: grayscale(0.25);
+      }
+
+      .footer {
+        margin-top: 20px;
+        font-size: 10px;
+        color: var(--muted);
+        border-top: 1px dashed #ccddee;
+        padding-top: 10px;
+      }
+
+      /* Reset button */
+      .reset-btn {
+        display: inline-block;
+        margin-top: 8px;
+        background: var(--accent-2);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 10px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .reset-btn:hover {
+        background: #2a7ee0;
+      }
+
+      @media (max-width: 600px) {
+        .menu {
+          grid-template-columns: 1fr;
+        }
+        .card {
+          padding: 28px;
+          min-height: 108px;
+        }
+      }
+
+      .card.reveal {
+        animation: pop 0.45s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+      }
+      .card.reveal:nth-child(1) {
+        animation-delay: 0.15s;
+      }
+      .card.reveal:nth-child(2) {
+        animation-delay: 0.25s;
+      }
+      .card.reveal:nth-child(3) {
+        animation-delay: 0.35s;
+      }
+      .card.reveal:nth-child(4) {
+        animation-delay: 0.45s;
+      }
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: translateY(18px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading -->
+    <div id="loader">
+      <div class="spinner"></div>
+      <div style="color: var(--muted); font-size: 12px">
+        Memuat — tunggu sebentar...
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="wrap" id="mainWrap" aria-hidden="true">
+      <h1>⚙️ Media Pembelajaran — Operasi Bilangan Bulat</h1>
+
+      <div class="menu" id="menuGrid">
+        <div class="card reveal" id="penjumlahan" role="button" tabindex="0">
+          <div class="icon">➕</div>
+          <div class="label">Penjumlahan</div>
+        </div>
+
+        <div class="card reveal" id="pengurangan" role="button" tabindex="0">
+          <div class="icon">➖</div>
+          <div class="label">Pengurangan</div>
+        </div>
+
+        <div class="card reveal" id="perkalian" role="button" tabindex="0">
+          <div class="icon">✖️</div>
+          <div class="label">Perkalian</div>
+        </div>
+
+        <div class="card reveal" id="pembagian" role="button" tabindex="0">
+          <div class="icon">➗</div>
+          <div class="label">Pembagian</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        🎮 Dikembangkan oleh <strong>Kelompok 2</strong><br />
+        <button class="reset-btn" id="resetBtn">🔄 Reset Progress</button>
+      </div>
+    </div>
+
+    <script>
+      // Loader animation
+      window.addEventListener("load", () => {
+        setTimeout(hideLoader, 1000);
+      });
+
+      function hideLoader() {
+        document.getElementById("loader").style.display = "none";
+        const wrap = document.getElementById("mainWrap");
+        wrap.classList.add("show");
+        wrap.removeAttribute("aria-hidden");
+        attachHandlers();
+        markDoneBadges();
+      }
+
+      // navigation handlers
+      function attachHandlers() {
+        const items = [
+          { id: "penjumlahan", href: "penjumlahan/materi.html" },
+          { id: "pengurangan", href: "pengurangan/materi.html" },
+          { id: "perkalian", href: "perkalian/materi.html" },
+          { id: "pembagian", href: "pembagian/materi.html" },
+        ];
+        items.forEach((it) => {
+          const el = document.getElementById(it.id);
+          el.addEventListener("click", () => tryGo(it.id, it.href));
+        });
+
+        // reset button
+        document.getElementById("resetBtn").addEventListener("click", () => {
+          if (confirm("Apakah kamu yakin ingin menghapus semua progres?")) {
+            localStorage.removeItem("doneList");
+            location.reload();
+          }
+        });
+      }
+
+      function tryGo(id, href) {
+        const doneList = JSON.parse(localStorage.getItem("doneList") || "{}");
+        if (doneList[id] === true) {
+          alert("✅ Modul ini sudah selesai.");
+          return;
+        }
+        window.location.href = href;
+      }
+
+      // mark badges
+      function markDoneBadges() {
+        const doneList = JSON.parse(localStorage.getItem("doneList") || "{}");
+        Object.keys(doneList).forEach((key) => {
+          if (doneList[key] === true) {
+            const el = document.getElementById(key);
+            if (el && !el.querySelector(".done-badge")) {
+              const badge = document.createElement("div");
+              badge.className = "done-badge";
+              badge.textContent = "DONE";
+              el.appendChild(badge);
+              el.classList.add("locked");
+            }
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

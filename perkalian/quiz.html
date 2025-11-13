@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Kuis — Perkalian</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg1: #dff6ff;
+        --bg2: #a6e0f9;
+        --bg3: #8ecae6;
+        --card: #ffffff;
+        --accent: #0077b6;
+        --accent-hover: #0096c7;
+        --text: #033860;
+        --ok: #00c851;
+        --bad: #ff4444;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Press Start 2P", cursive;
+        background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .card {
+        width: 100%;
+        max-width: 820px;
+        background: var(--card);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 28px rgba(9, 30, 45, 0.08);
+        border: 2px solid rgba(0, 119, 182, 0.15);
+        animation: fadeIn 0.8s ease;
+      }
+      h1 {
+        margin: 0 0 6px;
+        color: var(--accent);
+        font-size: 18px;
+        text-shadow: 0 0 4px rgba(0, 119, 182, 0.3);
+      }
+      #qNumber {
+        font-size: 12px;
+        color: var(--accent-hover);
+        margin-top: 4px;
+      }
+      #question {
+        margin: 14px 0;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .opts {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .opt-btn {
+        background: linear-gradient(180deg, #f0f8ff, #e9f6ff);
+        border: 1px solid rgba(0, 119, 182, 0.2);
+        padding: 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 12px;
+        color: var(--text);
+        transition: all 0.2s;
+      }
+      .opt-btn:hover {
+        background: var(--accent);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 22px rgba(58, 160, 255, 0.15);
+      }
+      .feedback {
+        margin-top: 12px;
+        font-size: 12px;
+        min-height: 20px;
+      }
+      .score {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--accent);
+      }
+      .done-screen {
+        display: none;
+        text-align: center;
+        margin-top: 18px;
+      }
+      .done-screen.show {
+        display: block;
+        animation: fadeIn 0.6s ease both;
+      }
+      .btn {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 11px;
+        transition: 0.2s;
+      }
+      .btn:hover {
+        background: var(--accent-hover);
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>✖️ Kuis Perkalian</h1>
+      <div id="roundArea">
+        <div id="qNumber">Soal 1 dari 5</div>
+        <div id="question">Memuat soal...</div>
+        <div class="opts" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="score" id="score">Skor: 0</div>
+      </div>
+
+      <div class="done-screen" id="doneScreen">
+        <div style="font-size: 20px; color: var(--ok)">✅ Selesai!</div>
+        <div id="finalScore" style="margin-top: 8px; color: var(--text)"></div>
+        <div style="margin-top: 12px">
+          <button id="goIndex" class="btn">Kembali ke Menu Utama</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suara -->
+    <audio id="sndCorrect" preload="auto">
+      <source
+        src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0e89b8e87b.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+    <audio id="sndWrong" preload="auto">
+      <source
+        src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5a1a6d0a7c.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+
+    <script>
+      const questions = [
+        {
+          q: "3 × 4 = ?",
+          options: ["10", "11", "12", "13"],
+          answer: "12",
+          explain: "3 × 4 = 12",
+        },
+        {
+          q: "5 × 2 = ?",
+          options: ["8", "10", "12", "15"],
+          answer: "10",
+          explain: "5 × 2 = 10",
+        },
+        {
+          q: "6 × 7 = ?",
+          options: ["36", "40", "42", "49"],
+          answer: "42",
+          explain: "6 × 7 = 42",
+        },
+        {
+          q: "9 × 3 = ?",
+          options: ["18", "27", "21", "24"],
+          answer: "27",
+          explain: "9 × 3 = 27",
+        },
+        {
+          q: "8 × 8 = ?",
+          options: ["56", "64", "72", "48"],
+          answer: "64",
+          explain: "8 × 8 = 64",
+        },
+      ];
+
+      const qNumber = document.getElementById("qNumber");
+      const qEl = document.getElementById("question");
+      const optsEl = document.getElementById("options");
+      const feedbackEl = document.getElementById("feedback");
+      const scoreEl = document.getElementById("score");
+      const doneScreen = document.getElementById("doneScreen");
+      const finalScore = document.getElementById("finalScore");
+      const goIndex = document.getElementById("goIndex");
+      const sndCorrect = document.getElementById("sndCorrect");
+      const sndWrong = document.getElementById("sndWrong");
+
+      let idx = 0,
+        score = 0,
+        locked = false;
+
+      const done = JSON.parse(localStorage.getItem("doneList") || "{}");
+      if (done["perkalian"] === true) {
+        qEl.textContent = "Kamu sudah menyelesaikan perkalian sebelumnya.";
+        optsEl.innerHTML = "";
+        feedbackEl.textContent = "Mengembalikan ke menu utama...";
+        setTimeout(() => (location.href = "../index.html"), 1300);
+      } else {
+        renderQ();
+      }
+
+      function renderQ() {
+        locked = false;
+        feedbackEl.textContent = "";
+        const cur = questions[idx];
+        qNumber.textContent = `Soal ${idx + 1} dari ${questions.length}`;
+        qEl.textContent = cur.q;
+        optsEl.innerHTML = "";
+        cur.options.forEach((opt) => {
+          const b = document.createElement("button");
+          b.className = "opt-btn";
+          b.textContent = opt;
+          b.onclick = () => selectAnswer(opt);
+          optsEl.appendChild(b);
+        });
+        scoreEl.textContent = `Skor: ${score}`;
+      }
+
+      function selectAnswer(opt) {
+        if (locked) return;
+        locked = true;
+        const cur = questions[idx];
+        Array.from(optsEl.children).forEach((c) => (c.disabled = true));
+
+        if (opt === cur.answer) {
+          feedbackEl.innerHTML = `<span style="color:var(--ok)">✓ Benar : ${cur.explain}</span>`;
+          sndCorrect.currentTime = 0;
+          sndCorrect.play();
+          score += 20;
+        } else {
+          feedbackEl.innerHTML = `<span style="color:var(--bad)">✗ Salah : Jawaban: ${cur.answer}</span>`;
+          sndWrong.currentTime = 0;
+          sndWrong.play();
+        }
+        scoreEl.textContent = `Skor: ${score}`;
+
+        setTimeout(() => {
+          idx++;
+          if (idx < questions.length) renderQ();
+          else finishQuiz();
+        }, 1200);
+      }
+
+      function finishQuiz() {
+        const doneList = JSON.parse(localStorage.getItem("doneList") || "{}");
+        doneList["perkalian"] = true;
+        localStorage.setItem("doneList", JSON.stringify(doneList));
+        document.getElementById("roundArea").style.display = "none";
+        doneScreen.classList.add("show");
+        finalScore.textContent = `Skor akhir: ${score} / ${
+          questions.length * 20
+        }`;
+        goIndex.onclick = () => (location.href = "../index.html");
+        setTimeout(() => (location.href = "../index.html"), 2000);
+      }
+    </script>
+  </body>
+</html>
